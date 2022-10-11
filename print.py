@@ -4,10 +4,12 @@ import base64
 import json
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+from webdriver_manager.chrome import ChromeDriverManager
 from PyPDF2 import PdfFileMerger
 import streamlit as st
 
@@ -19,10 +21,26 @@ ADMIN_PASSWORD = st.secrets["ADMIN_PASSWORD"]
 def load_options():
     # initialize the Chrome driver
     options = Options()
+    service = Service(ChromeDriverManager().install())
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.add_argument('--headless')
-    #executable_path=CHROME_PATH, 
-    driver = webdriver.Chrome(chrome_options=options)
+    driver = webdriver.Chrome(chrome_options=options, service=service)
+
+    #set up a second driver just for printing 
+    temp_options = webdriver.ChromeOptions()
+    settings = {
+        "recentDestinations": [{
+                "id": "Save as PDF",
+                "origin": "local",
+                "account": "",
+            }],
+            "selectedDestinationId": "Save as PDF",
+            "version": 2
+        }
+    prefs = {'printing.print_preview_sticky_settings.appState': json.dumps(settings)}
+    temp_options.add_experimental_option('prefs', prefs)
+    temp_options.add_argument('--kiosk-printing --headless')
+    temp_driver = webdriver.Chrome(chrome_options=temp_options, service=service)
 
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
@@ -45,9 +63,9 @@ def load_options():
     class_select = Select(WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH,'//*[@id="cp_lophoc"]'))))
 
-    return driver, class_select
+    return driver, temp_driver, class_select
 
-driver, class_select = load_options()
+driver, temp_driver, class_select = load_options()
 
 
 class_option = st.selectbox(
@@ -81,28 +99,13 @@ if printing:
         files.append(f'{name}.pdf')
         print_url = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH,f'//*[@id="dyntable"]/tbody/tr[{i}]/td[2]/a'))).get_attribute('href')
-        chrome_options = webdriver.ChromeOptions()
-        settings = {
-            "recentDestinations": [{
-                    "id": "Save as PDF",
-                    "origin": "local",
-                    "account": "",
-                }],
-                "selectedDestinationId": "Save as PDF",
-                "version": 2
-            }
-        prefs = {'printing.print_preview_sticky_settings.appState': json.dumps(settings)}
-        chrome_options.add_experimental_option('prefs', prefs)
-        chrome_options.add_argument('--kiosk-printing --headless')
-        temp_driver = webdriver.Chrome(chrome_options=chrome_options)
         temp_driver.get(print_url)
         pdf = temp_driver.execute_cdp_cmd("Page.printToPDF", {
         "printBackground": True
         }) 
         with open(f'{name}.pdf','wb') as f:
             f.write(base64.b64decode(pdf['data']))
-        st.success(f'{name}', icon="✅")     
-        temp_driver.quit()
+        st.success(f'{name}', icon="✅")
 
     ''' Merges all the pdf files in current directory '''
     merger = PdfFileMerger()
