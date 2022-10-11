@@ -108,15 +108,12 @@ if printing:
             EC.presence_of_element_located((By.XPATH,f'//*[@id="dyntable"]/tbody/tr[{i}]/td[2]/a'))).get_attribute('href')
         temp_driver.get(print_url)
         pdf = temp_driver.execute_cdp_cmd("Page.printToPDF", {
-        "printBackground": True
+        "printBackground": True,"pageRanges":"1"
         }) 
         with open(f'{name}.pdf','wb') as f:
             f.write(base64.b64decode(pdf['data']))
         st.success(f'{name}', icon="✅")
-
-    ''' Merges all the pdf files in current directory '''
     merger = PdfFileMerger()
-    st.write(files)
     #Iterate over the list of the file paths
     for pdf_file in files:
         #Append PDF files
