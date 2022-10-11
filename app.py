@@ -2,29 +2,32 @@ import os
 import time
 import base64
 import json
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
-from webdriver_manager.chrome import ChromeDriverManager
 from PyPDF2 import PdfFileMerger
 import streamlit as st
 
 # getting credentials from environment variables(streamlit secrets)
-ADMIN_USERNAME = st.secrets["ADMIN_USERNAME"]
-ADMIN_PASSWORD = st.secrets["ADMIN_PASSWORD"]
-
+load_dotenv()
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH")
+GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")
 @st.cache(allow_output_mutation=True)
 def load_options():
     # initialize the Chrome driver
     options = Options()
-    service = Service(ChromeDriverManager().install())
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    options.binary_location = GOOGLE_CHROME_BIN
     options.add_argument('--headless')
-    driver = webdriver.Chrome(chrome_options=options, service=service)
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--no-sandbox")
+    driver = webdriver.Chrome(chrome_options=options, executable_path=CHROMEDRIVER_PATH)
 
     #set up a second driver just for printing 
     temp_options = webdriver.ChromeOptions()
@@ -38,9 +41,13 @@ def load_options():
             "version": 2
         }
     prefs = {'printing.print_preview_sticky_settings.appState': json.dumps(settings)}
+    temp_options.binary_location = GOOGLE_CHROME_BIN
     temp_options.add_experimental_option('prefs', prefs)
-    temp_options.add_argument('--kiosk-printing --headless')
-    temp_driver = webdriver.Chrome(chrome_options=temp_options, service=service)
+    temp_options.add_argument('--kiosk-printing')
+    temp_options.add_argument("--disable-dev-shm-usage")
+    temp_options.add_argument("--no-sandbox")
+    temp_options.add_argument('--headless')
+    temp_driver = webdriver.Chrome(chrome_options=temp_options, executable_path=CHROMEDRIVER_PATH)
 
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
