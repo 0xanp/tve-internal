@@ -81,7 +81,7 @@ class_option = st.selectbox(
 
 class_select.select_by_visible_text(class_option)
 # give some time for the webdriver to refresh the site after class selection
-time.sleep(.1)
+time.sleep(1)
 test_select = Select(WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH,'//*[@id="maudiem"]'))))
 
