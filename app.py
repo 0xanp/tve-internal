@@ -23,7 +23,7 @@ def load_options():
     # initialize the Chrome driver
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    #options.binary_location = GOOGLE_CHROME_BIN
+    options.binary_location = GOOGLE_CHROME_BIN
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
@@ -41,7 +41,7 @@ def load_options():
             "version": 2
         }
     prefs = {'printing.print_preview_sticky_settings.appState': json.dumps(settings)}
-    #temp_options.binary_location = GOOGLE_CHROME_BIN
+    temp_options.binary_location = GOOGLE_CHROME_BIN
     temp_options.add_experimental_option('prefs', prefs)
     temp_options.add_argument('--kiosk-printing')
     temp_options.add_argument("--disable-dev-shm-usage")
