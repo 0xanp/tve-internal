@@ -33,7 +33,7 @@ def load_options():
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = GOOGLE_CHROME_BIN
-    #options.add_argument('--headless')
+    options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(chrome_options=options, executable_path=CHROMEDRIVER_PATH)
