@@ -102,9 +102,9 @@ if uploaded_file is not None:
     confirm = st.button('Confirm adding course')
     if confirm:
         for i in range(3):
-            time.sleep(1)
+            time.sleep(.5)
             driver.execute_script("baihoc_add()")
-            time.sleep(1)
+            time.sleep(.75)
             # Add ngay
             add_ngay = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
@@ -141,4 +141,4 @@ if uploaded_file is not None:
             
             # Submit
             driver.execute_script("checkform()")
-            st.success(f"{class_option}\n{ngay}\n{lesson}", icon="✅")
+            st.success(f"{class_option}-{ngay}", icon="✅")
