@@ -18,6 +18,14 @@ ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH")
 GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")
+
+st.set_page_config(
+    page_title="Tri Viet Education",
+    page_icon=":pager:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 @st.cache(allow_output_mutation=True)
 def load_options():
     # initialize the Chrome driver
