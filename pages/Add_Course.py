@@ -56,7 +56,7 @@ def load_options():
     driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc_baihoc')
 
     class_select = Select(WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,'//*[@id="idlophoc"]'))))
+                EC.element_to_be_clickable((By.XPATH,'//*[@id="idlophoc"]'))))
 
     return driver, class_select
 
