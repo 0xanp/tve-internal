@@ -59,22 +59,9 @@ def load_options():
                 EC.presence_of_element_located((By.XPATH,'//*[@id="idlophoc"]'))))
 
     return driver, class_select
-    
-driver, class_select = load_options()
 
-class_option = st.selectbox(
-    'Class',
-    tuple([class_name.text for class_name in class_select.options]))
-
-class_select.select_by_visible_text(class_option)
-#class_select.select_by_visible_text('MOVERS 1 - K40')
-# give some time for the webdriver to refresh the site after class selection
-#time.sleep(1)
-
-uploaded_file = st.file_uploader("Choose a file")
-
-if uploaded_file is not None:
-    document = docx.Document(uploaded_file)
+def docx_to_data(file):
+    document = docx.Document(file)
     table = document.tables[0]
 
     # Data will be a list of rows represented as dictionaries
@@ -96,17 +83,25 @@ if uploaded_file is not None:
         
         row_data = dict(zip(keys, text))
         if 'DAYS' in row_data.keys() and row_data['DAYS'] != 'DAYS':
-            st.write(row_data)
             data.append(row_data)
 
-    # Construct a tuple for this row
-    row_data = tuple(text)
-    data.append(row_data)
-    #df = pd.DataFrame(data)
-    #st.write(data)
+    return data
+
+driver, class_select = load_options()
+
+class_option = st.selectbox(
+    'Class',
+    tuple([class_name.text for class_name in class_select.options]))
+
+class_select.select_by_visible_text(class_option)
+
+uploaded_file = st.file_uploader("Choose a file")
+
+if uploaded_file is not None:
+    data = docx_to_data(uploaded_file)
     confirm = st.button('Confirm adding course')
     if confirm:
-        for i in range(len(df)):
+        for i in range(3):
             time.sleep(.5)
             driver.execute_script("baihoc_add()")
             time.sleep(.5)
@@ -115,34 +110,36 @@ if uploaded_file is not None:
             add_ngay = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
             add_ngay.clear()
-            add_ngay.send_keys(df.iloc[i]['Ngay'], Keys.ENTER)
+            ngay = data[i]['DAYS']
+            add_ngay.send_keys(ngay, Keys.ENTER)
             
             # Add Lesson
             driver.switch_to.frame(0)
             add_lesson = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH,'/html/body')))
             add_lesson.click()
-            add_lesson.send_keys(df.iloc[i]['Lesson'])
+            lesson = f"{data[i]['UNITS']}\n\nSB: {data[i]['SB']}\nWB: {data[i]['WB']}\n\n{data[i]['LANGUAGE FOCUS']}"
+            add_lesson.send_keys(lesson)
             driver.switch_to.default_content()
 
             # Add Homework if there is one
-            if df.iloc[i]['Homework']:
+            if data[i]['NOTES']:
                 driver.switch_to.frame(1)
                 add_homework = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH,'/html/body')))
                 add_homework.click()
-                add_homework.send_keys(df.iloc[i]['Homework'])
+                add_homework.send_keys(data[i]['NOTES'])
                 driver.switch_to.default_content()
             
             # Add Thong Bao if there is one
-            if df.iloc[i]['Thong Bao']:
+            if data[i]['NOTES']:
                 driver.switch_to.frame(2)
                 add_thongbao = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH,'/html/body')))
                 add_thongbao.click()
-                add_thongbao.send_keys(df.iloc[i]['Thong Bao'])
+                add_thongbao.send_keys(data[i]['NOTES'])
                 driver.switch_to.default_content()
             
             # Submit
             driver.execute_script("checkform()")
-            st.success(f"{class_option}-{df.iloc[i]['Ngay']}", icon="✅")
+            st.success(f"{class_option}\n{ngay}\n{lesson}", icon="✅")
