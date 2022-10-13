@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run Print_Score.py
+web: sh setup.sh && touch '/tmp/app-initialized' && bin/start-nginx && streamlit run Print_Score.py
