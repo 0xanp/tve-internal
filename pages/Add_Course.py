@@ -49,7 +49,7 @@ def load_options():
 
     driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc_baihoc')
 
-    class_select = Select(WebDriverWait(driver, 10).until(
+    class_select = Select(WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="idlophoc"]'))))
 
     return driver, class_select
@@ -99,7 +99,7 @@ if uploaded_file is not None:
             driver.execute_script("baihoc_add()")
             time.sleep(1)
             # Add ngay
-            add_ngay = WebDriverWait(driver, 10).until(
+            add_ngay = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
             add_ngay.clear()
             st.write(data[i]['DAYS'])
@@ -108,7 +108,7 @@ if uploaded_file is not None:
             break
             # Add Lesson
             driver.switch_to.frame(0)
-            add_lesson = WebDriverWait(driver, 10).until(
+            add_lesson = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH,'/html/body')))
             add_lesson.click()
             lesson = f"{data[i]['UNITS']}\n\nSB: {data[i]['SB']}\nWB: {data[i]['WB']}\n\n{data[i]['LANGUAGE FOCUS']}"
@@ -127,7 +127,7 @@ if uploaded_file is not None:
             # Add Thong Bao if there is one
             if data[i]['NOTES']:
                 driver.switch_to.frame(2)
-                add_thongbao = WebDriverWait(driver, 10).until(
+                add_thongbao = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH,'/html/body')))
                 add_thongbao.click()
                 add_thongbao.send_keys(data[i]['NOTES'])

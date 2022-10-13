@@ -37,18 +37,6 @@ def html_to_dataframe(table_header, table_data):
     df = df.iloc[: , 1:]
     return df
 
-def styling():
-    # CSS to inject contained in a string
-    hide_table_row_index = """
-                <style>
-                thead tr th:first-child {display:none}
-                tbody th {display:none}
-                </style>
-                """
-
-    # Inject CSS with Markdown
-    st.markdown(hide_table_row_index, unsafe_allow_html=True)
-
 @st.cache(allow_output_mutation=True)
 def load_options():
     # initialize the Chrome driver
@@ -74,41 +62,36 @@ def load_options():
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
     table_data = WebDriverWait(driver, 2).until(
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
+    course_dict = {}
     course_df = html_to_dataframe(table_header, table_data)
-    return driver, course_df
+    for i in range(1,len(course_df)+1):
+        siso_button = WebDriverWait(driver, 2).until(
+                    EC.element_to_be_clickable((By.XPATH, f'//*[@id="showlist"]/tr[{i}]/td[5]/a[1]')))
+        driver.execute_script("arguments[0].click();", siso_button)
+        table_header = WebDriverWait(driver, 3).until(
+                    EC.presence_of_all_elements_located((By.XPATH,'//*[@id="static"]/thead/tr/th')))
+        table_data = WebDriverWait(driver, 3).until(
+                    EC.presence_of_all_elements_located((By.XPATH,'//*[@id="ctl10_container"]/tr')))
+        course_dict[str(course_df.iloc[i-1]['Tên Lớp'])] = html_to_dataframe(table_header, table_data)
+        # navigate to lop hoc
+        driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc')
 
-driver, course_df = load_options()
+    return driver, course_df, course_dict
 
-all_courses = st.checkbox('Show All Course')
-
+driver, course_df, course_dict = load_options()
+all_students = st.checkbox('Show All Course')
 placeholder = st.empty()
 
-course_option = placeholder.selectbox(
-    'Class',
-    (list(course_df['Tên Lớp'])),
-    disabled=False, 
-    key='1'
-)
-
-if all_courses:
+if all_students:
     placeholder.selectbox(
     'Class',
     (list(course_df['Tên Lớp'])),
     disabled=True, 
-    key='2'
+    key='3'
     )
-    st.table(course_df)
-
-else:
-    course_index = course_df.loc[course_df['Tên Lớp']==course_option].index.tolist()[0]+1
-    siso_button = WebDriverWait(driver, 3).until(
-                EC.element_to_be_clickable((By.XPATH, f'//*[@id="showlist"]/tr[{course_index}]/td[5]/a[1]')))
-    driver.execute_script("arguments[0].click();", siso_button)
-    table_header = WebDriverWait(driver, 3).until(
-                EC.presence_of_all_elements_located((By.XPATH,'//*[@id="static"]/thead/tr/th')))
-    table_data = WebDriverWait(driver, 3).until(
-                EC.presence_of_all_elements_located((By.XPATH,'//*[@id="ctl10_container"]/tr')))
-    temp_df = html_to_dataframe(table_header, table_data)
-    # navigate to lop hoc
-    driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc')
-    st.table(temp_df)
+    big_df = pd.DataFrame()
+    for course_name, course_students in course_dict.items():
+        small_df = course_dict[course_name]
+        small_df[course_name] = [course_name for i in len(small_df)]
+        big_df = pd.concat([big_df, small_df])
+    st.table(big_df)

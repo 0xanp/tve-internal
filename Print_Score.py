@@ -67,15 +67,15 @@ def load_options():
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
 
     # click lop hoc
-    lop_hoc_button = WebDriverWait(driver, 10).until(
+    lop_hoc_button = WebDriverWait(driver, 2).until(
             EC.presence_of_element_located((By.XPATH,'//*[@id="content"]/section/section/section/section/div/div[1]/div[1]/div/div[4]/a')))
     lop_hoc_button.click()
 
     # click nhap diem
-    nhap_diem_button = WebDriverWait(driver, 10).until(
+    nhap_diem_button = WebDriverWait(driver, 2).until(
             EC.presence_of_element_located((By.XPATH,'//*[@id="menutop_nhapdiem"]/a/span[2]/span')))
     nhap_diem_button.click() 
-    class_select = Select(WebDriverWait(driver, 10).until(
+    class_select = Select(WebDriverWait(driver, 2).until(
                 EC.presence_of_element_located((By.XPATH,'//*[@id="cp_lophoc"]'))))
 
     return driver, temp_driver, class_select
@@ -91,7 +91,7 @@ class_select.select_by_visible_text(class_option)
 # give some time for the webdriver to refresh the site after class selection
 time.sleep(1)
 
-test_select = Select(WebDriverWait(driver, 10).until(
+test_select = Select(WebDriverWait(driver, 2).until(
                 EC.presence_of_element_located((By.XPATH,'//*[@id="maudiem"]'))))
 
 test_option = st.selectbox(
@@ -110,10 +110,10 @@ if printing:
     st.write("Combining", len(rows)-1)
     files = []
     for i in range(1, len(rows)):
-        name = WebDriverWait(driver, 10).until(
+        name = WebDriverWait(driver, 2).until(
             EC.presence_of_element_located((By.XPATH,f'//*[@id="dyntable"]/tbody/tr[{i}]/td[2]/div'))).text
         files.append(f'{name}.pdf')
-        print_url = WebDriverWait(driver, 10).until(
+        print_url = WebDriverWait(driver, 2).until(
             EC.presence_of_element_located((By.XPATH,f'//*[@id="dyntable"]/tbody/tr[{i}]/td[2]/a'))).get_attribute('href')
         temp_driver.get(print_url)
         pdf = temp_driver.execute_cdp_cmd("Page.printToPDF", {
