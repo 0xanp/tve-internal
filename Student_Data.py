@@ -22,7 +22,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-def html_to_dataframe(table_header, table_data):
+def html_to_dataframe(table_header, table_data, course_name=None):
     header_row = []
     df_data = []
     for header in table_header:
@@ -35,6 +35,9 @@ def html_to_dataframe(table_header, table_data):
         df_data.append(table_row)
     df = pd.DataFrame(df_data,columns=header_row)
     df = df.iloc[: , 1:]
+    if course_name:
+        temp = [course_name for i in range(len(df))]
+        df['Course'] = temp
     return df
 
 def styling():
@@ -70,9 +73,9 @@ def load_options():
     # navigate to lop hoc
     driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc')
     # pulling the main table
-    table_header = WebDriverWait(driver, 2).until(
+    table_header = WebDriverWait(driver, 3).until(
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
-    table_data = WebDriverWait(driver, 2).until(
+    table_data = WebDriverWait(driver, 3).until(
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
     course_df = html_to_dataframe(table_header, table_data)
     return driver, course_df
@@ -84,7 +87,7 @@ all_courses = st.checkbox('Show All Course')
 placeholder = st.empty()
 
 course_option = placeholder.selectbox(
-    'Class',
+    'Course',
     (list(course_df['Tên Lớp'])),
     disabled=False, 
     key='1'

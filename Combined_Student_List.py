@@ -22,7 +22,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-def html_to_dataframe(table_header, table_data):
+def html_to_dataframe(table_header, table_data, course_name=None):
     header_row = []
     df_data = []
     for header in table_header:
@@ -35,6 +35,9 @@ def html_to_dataframe(table_header, table_data):
         df_data.append(table_row)
     df = pd.DataFrame(df_data,columns=header_row)
     df = df.iloc[: , 1:]
+    if course_name:
+        temp = [course_name for i in range(len(df))]
+        df['Course'] = temp
     return df
 
 @st.cache(allow_output_mutation=True)
@@ -79,19 +82,17 @@ def load_options():
     return driver, course_df, course_dict
 
 driver, course_df, course_dict = load_options()
-all_students = st.checkbox('Show All Course')
 placeholder = st.empty()
 
-if all_students:
-    placeholder.selectbox(
-    'Class',
-    (list(course_df['Tên Lớp'])),
-    disabled=True, 
-    key='3'
-    )
-    big_df = pd.DataFrame()
-    for course_name, course_students in course_dict.items():
-        small_df = course_dict[course_name]
-        small_df[course_name] = [course_name for i in len(small_df)]
-        big_df = pd.concat([big_df, small_df])
-    st.table(big_df)
+placeholder.selectbox(
+'Class',
+(list(course_df['Tên Lớp'])),
+disabled=True, 
+key='3'
+)
+big_df = pd.DataFrame()
+for course_name, course_students in course_dict.items():
+    small_df = course_dict[course_name]
+    small_df[course_name] = [course_name for i in len(small_df)]
+    big_df = pd.concat([big_df, small_df])
+st.table(big_df)
