@@ -16,8 +16,8 @@ from selenium.webdriver.support.ui import Select
 
 # getting credentials from environment variables(streamlit secrets)
 load_dotenv()
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+MANAGER_USERNAME = os.getenv("MANAGER_USERNAME")
+MANAGER_PASSWORD = os.getenv("MANAGER_PASSWORD")
 CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH")
 GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")
 
@@ -33,7 +33,7 @@ def load_options():
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = GOOGLE_CHROME_BIN
-    options.add_argument('--headless')
+    #options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(chrome_options=options, executable_path=CHROMEDRIVER_PATH)
@@ -41,17 +41,11 @@ def load_options():
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
-    driver.find_element("id","user").send_keys(ADMIN_USERNAME)
+    driver.find_element("id","user").send_keys(MANAGER_USERNAME)
     # find password input field and insert password as well
-    driver.find_element("id","pass").send_keys(ADMIN_PASSWORD)
+    driver.find_element("id","pass").send_keys(MANAGER_PASSWORD)
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
-
-    # click lop hoc
-    lop_hoc = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH,'//*[@id="content"]/section/section/section/section/div/div[1]/div[1]/div/div[4]/a')))
-    
-    lop_hoc.click()
 
     driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc_baihoc')
 
@@ -62,16 +56,14 @@ def load_options():
 
 def docx_to_data(file):
     document = docx.Document(file)
-    table = document.tables[0]
+    table = document.tables[1]
 
     # Data will be a list of rows represented as dictionaries
     # containing each row's data.
     data = []
-
     keys = None
-    for i, row in enumerate(table.rows[12:]):
+    for i, row in enumerate(table.rows):
         text = (cell.text for cell in row.cells)
-
         # Establish the mapping based on the first row
         # headers; these will become the keys of our dictionary
         if i == 0:
@@ -82,6 +74,7 @@ def docx_to_data(file):
         # keys to values for this row
         
         row_data = dict(zip(keys, text))
+        st.write(row_data)
         if 'DAYS' in row_data.keys() and row_data['DAYS'] != 'DAYS':
             data.append(row_data)
 
@@ -99,6 +92,7 @@ uploaded_file = st.file_uploader("Choose a file")
 
 if uploaded_file is not None:
     data = docx_to_data(uploaded_file)
+    #st.write(data)
     confirm = st.button('Confirm adding course')
     if confirm:
         for i in range(3):
@@ -109,9 +103,10 @@ if uploaded_file is not None:
             add_ngay = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
             add_ngay.clear()
-            ngay = data[i]['DAYS']
+            st.write(data[i]['DAYS'])
+            ngay = data[i]['DAYS'].split()[1]
             add_ngay.send_keys(ngay, Keys.ENTER)
-            
+            break
             # Add Lesson
             driver.switch_to.frame(0)
             add_lesson = WebDriverWait(driver, 10).until(

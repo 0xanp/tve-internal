@@ -14,8 +14,8 @@ import streamlit as st
 
 # getting credentials from environment variables(streamlit secrets)
 load_dotenv()
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+MANAGER_USERNAME = os.getenv("MANAGER_USERNAME")
+MANAGER_PASSWORD = os.getenv("MANAGER_PASSWORD")
 CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH")
 GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")
 
@@ -60,9 +60,9 @@ def load_options():
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
-    driver.find_element("id","user").send_keys(ADMIN_USERNAME)
+    driver.find_element("id","user").send_keys(MANAGER_USERNAME)
     # find password input field and insert password as well
-    driver.find_element("id","pass").send_keys(ADMIN_PASSWORD)
+    driver.find_element("id","pass").send_keys(MANAGER_PASSWORD)
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
 
