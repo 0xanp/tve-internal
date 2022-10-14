@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
 import docx
-import io
 from dotenv import load_dotenv
 import os
 import time
-import json
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
@@ -33,7 +31,7 @@ def load_options():
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = GOOGLE_CHROME_BIN
-    #options.add_argument('--headless')
+    options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(chrome_options=options, executable_path=CHROMEDRIVER_PATH)
