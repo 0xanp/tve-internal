@@ -1,11 +1,8 @@
 import streamlit as st
-import pandas as pd
 import docx
-import io
 from dotenv import load_dotenv
 import os
 import time
-import json
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -109,25 +106,6 @@ if uploaded_file is not None:
             lesson = f"{data[i]['UNITS']}\n{data[i]['PAGES']}\n{data[i]['LANGUAGE FOCUS']}"
             add_lesson.send_keys(lesson)
             driver.switch_to.default_content()
-
-            # Add Homework if there is one
-            if data[i]['NOTES']:
-                driver.switch_to.frame(1)
-                add_homework = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH,'/html/body')))
-                add_homework.click()
-                add_homework.send_keys(data[i]['NOTES'])
-                driver.switch_to.default_content()
-            
-            # Add Thong Bao if there is one
-            if data[i]['NOTES']:
-                driver.switch_to.frame(2)
-                add_thongbao = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH,'/html/body')))
-                add_thongbao.click()
-                add_thongbao.send_keys(data[i]['NOTES'])
-                driver.switch_to.default_content()
-            
             # Submit
             driver.execute_script("checkform()")
             st.success(f"{class_option}-{ngay}", icon="✅")
