@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
 import docx
+import io
 from dotenv import load_dotenv
 import os
 import time
+import json
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -70,7 +72,6 @@ def docx_to_data(file):
         # keys to values for this row
         
         row_data = dict(zip(keys, text))
-        st.write(row_data)
         if 'DAYS' in row_data.keys() and row_data['DAYS'] != 'DAYS':
             data.append(row_data)
 
@@ -88,10 +89,9 @@ uploaded_file = st.file_uploader("Choose a file")
 
 if uploaded_file is not None:
     data = docx_to_data(uploaded_file)
-    #st.write(data)
     confirm = st.button('Confirm adding course')
     if confirm:
-        for i in range(3):
+        for i in range(len(data)):
             time.sleep(1)
             driver.execute_script("baihoc_add()")
             time.sleep(1)
@@ -99,16 +99,14 @@ if uploaded_file is not None:
             add_ngay = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
             add_ngay.clear()
-            st.write(data[i]['DAYS'])
-            ngay = data[i]['DAYS'].split()[1]
+            ngay = data[i]['DAYS'].split('\n')[1]
             add_ngay.send_keys(ngay, Keys.ENTER)
-            break
             # Add Lesson
             driver.switch_to.frame(0)
             add_lesson = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH,'/html/body')))
             add_lesson.click()
-            lesson = f"{data[i]['UNITS']}\n\nSB: {data[i]['SB']}\nWB: {data[i]['WB']}\n\n{data[i]['LANGUAGE FOCUS']}"
+            lesson = f"{data[i]['UNITS']}\n{data[i]['PAGES']}\n{data[i]['LANGUAGE FOCUS']}"
             add_lesson.send_keys(lesson)
             driver.switch_to.default_content()
 
@@ -124,7 +122,7 @@ if uploaded_file is not None:
             # Add Thong Bao if there is one
             if data[i]['NOTES']:
                 driver.switch_to.frame(2)
-                add_thongbao = WebDriverWait(driver, 2).until(
+                add_thongbao = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH,'/html/body')))
                 add_thongbao.click()
                 add_thongbao.send_keys(data[i]['NOTES'])
