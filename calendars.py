@@ -3,6 +3,7 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 import time
+import io
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -63,9 +64,9 @@ def load_options():
     # navigate to lop hoc
     driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc')
     # pulling the main table
-    table_header = WebDriverWait(driver, 3).until(
+    table_header = WebDriverWait(driver, 2).until(
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
-    table_data = WebDriverWait(driver, 3).until(
+    table_data = WebDriverWait(driver, 2).until(
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
     courses_df = html_to_dataframe(table_header, table_data)
     # navigate to bai hoc
@@ -92,13 +93,13 @@ if confirm:
     filtered_course_rooms = []
     for course in courses:
         course_select.select_by_visible_text(course)
-        time.sleep(1)
+        time.sleep(.1)
         # pulling the main table
-        table_header = WebDriverWait(driver, 3).until(
+        table_header = WebDriverWait(driver, 2).until(
                     EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
-        table_data = WebDriverWait(driver, 3).until(
+        table_data = WebDriverWait(driver, 2).until(
                     EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
-
+        time.sleep(.25)
         course_df = html_to_dataframe(table_header, table_data)
 
         midterm_name = course_df[course_df['Bài học/Lesson'].str.match(r'MIDTERM TEST*') == True]['Bài học/Lesson'].to_list()
@@ -119,9 +120,8 @@ if confirm:
                     temp_2 = temp[2].split(" ")[2].split("\n")[0]
                     room = f'{temp[1].split(")")[1]}-{temp_1} {temp_2}'
                     filtered_course_rooms.append(room)
-                    class_date = f"{class_date.strftime('%A')} {midterm_date[i]}"
+                    class_date = f"{midterm_date[i]}, {class_date.strftime('%A')}"
                     filtered_dates.append(class_date)
-                    st.write(f'{course}-{midterm_name[i]}-{course_time}-{room}-{class_date}')
                     st.success(course, icon="✅")
         if final_date:
             for i in range(len(final_date)):
@@ -136,9 +136,8 @@ if confirm:
                     temp_2 = temp[2].split(" ")[2].split("\n")[0]
                     room = f'{temp[1].split(")")[1]}-{temp_1} {temp_2}'
                     filtered_course_rooms.append(room)
-                    class_date = f"{class_date.strftime('%A')} {final_date[i]}"
+                    class_date = f"{final_date[i]}, {class_date.strftime('%A')}"
                     filtered_dates.append(class_date)
-                    st.write(f'{course}-{final_name[i]}-{course_time}-{room}-{class_date}')
                     st.success(course, icon="✅")
     df = pd.DataFrame()
     df['Course'] = filtered_courses
@@ -146,4 +145,20 @@ if confirm:
     df['Date'] = filtered_dates
     df['Class Time'] = filtered_course_time
     df['Room'] = filtered_course_rooms
+    df = df.sort_values(by=['Date'])
+    df = df.reset_index(drop=True)
     st.table(df)
+    buffer = io.BytesIO()
+    # Create a Pandas Excel writer using XlsxWriter as the engine.
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        # Write each dataframe to a different worksheet.
+        df.to_excel(writer, sheet_name='Sheet1')
+
+        # Close the Pandas Excel writer and output the Excel file to the buffer
+        writer.save()
+        st.download_button(
+            label="Download Excel worksheets",
+            data=buffer,
+            file_name=f'Test-Dates-from-{start_date}-to-{end_date}.xlsx',
+            mime="application/vnd.ms-excel"
+        )
