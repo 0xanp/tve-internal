@@ -93,15 +93,14 @@ if confirm:
     filtered_course_rooms = []
     for course in courses:
         course_select.select_by_visible_text(course)
-        time.sleep(.1)
+        time.sleep(.75)
         # pulling the main table
         table_header = WebDriverWait(driver, 2).until(
                     EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
         table_data = WebDriverWait(driver, 2).until(
                     EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
-        time.sleep(.25)
+        time.sleep(.75)
         course_df = html_to_dataframe(table_header, table_data)
-
         midterm_name = course_df[course_df['Bài học/Lesson'].str.match(r'MIDTERM TEST*') == True]['Bài học/Lesson'].to_list()
         midterm_date = course_df[course_df['Bài học/Lesson'].str.match(r'MIDTERM TEST*') == True]['Ngày'].to_list()
         final_name = course_df[course_df['Bài học/Lesson'].str.match(r'FINAL TEST*') == True]['Bài học/Lesson'].to_list()
@@ -109,7 +108,6 @@ if confirm:
         if midterm_date:
             for i in range(len(midterm_date)):
                 class_date = datetime.strptime(midterm_date[i],'%d/%m/%Y').date()
-                #st.write(courses_df[courses_df['Tên Lớp'].str.match(course)== True]['Diễn Giải'].values[0].split('-'))
                 if "CORRECTION" not in str(midterm_name[i]) and class_date <= end_date and class_date >= start_date:
                     filtered_courses.append(course)
                     filtered_tests.append(midterm_name[i])
