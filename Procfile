@@ -1,1 +1,1 @@
-web: sh setup.sh && touch '/tmp/app-initialized' & bin/start-nginx streamlit run --server.enableCORS false --server.port 8501 Print_Score.py
+web: sh setup.sh && touch '/tmp/app-initialized' & bin/start-nginx streamlit run --server.enableCORS false --server.port 8501 app.py
