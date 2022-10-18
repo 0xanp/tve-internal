@@ -23,6 +23,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+@st.experimental_singleton
 def load_options():
     # initialize the Chrome driver
     options = Options()
@@ -75,7 +76,6 @@ def docx_to_data(file):
 
 driver, class_select = load_options()
 
-
 class_option = st.selectbox(
     'Class',
     tuple([class_name.text for class_name in class_select.options]))
@@ -83,6 +83,11 @@ class_option = st.selectbox(
 class_select.select_by_visible_text(class_option)
 
 uploaded_file = st.file_uploader("Choose a file")
+
+refresh = st.button("Refresh List")
+
+if refresh:
+    st.experimental_singleton.clear()
 
 if uploaded_file is not None:
     data = docx_to_data(uploaded_file)

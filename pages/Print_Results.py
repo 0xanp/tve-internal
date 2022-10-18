@@ -26,6 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+@st.experimental_singleton
 def load_options():
     # initialize the Chrome driver
     options = Options()
@@ -81,7 +82,6 @@ def load_options():
 
 driver, temp_driver, class_select = load_options()
 
-
 class_option = st.selectbox(
     'Class',
     tuple([class_name.text for class_name in class_select.options]))
@@ -97,6 +97,10 @@ test_option = st.selectbox(
     'Test',
     tuple([test.text for test in test_select.options]))
 
+refresh = st.button("Refresh List")
+
+if refresh:
+    st.experimental_singleton.clear()
 
 PDFbyte = bytes('', 'utf-8')
 placeholder = st.empty()
