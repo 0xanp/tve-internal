@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
+from datetime import datetime, timedelta
 
 # getting credentials from environment variables
 load_dotenv()
@@ -77,18 +78,22 @@ def load_options():
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
     table_data = WebDriverWait(driver, 3).until(
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
-    course_df = html_to_dataframe(table_header, table_data)
-    return driver, course_df
+    courses_df = html_to_dataframe(table_header, table_data)
+    return driver, courses_df
 
-driver, course_df = load_options()
+driver, courses_df = load_options()
 
 all_courses = st.checkbox('Show All Course')
+
+start_date = st.date_input('Select Start Date', datetime.today())
+
+end_date = st.date_input('Select End Date', datetime.today() + timedelta(days=7))
 
 placeholder = st.empty()
 
 course_option = placeholder.selectbox(
     'Course',
-    (list(course_df['Tên Lớp'])),
+    (list(courses_df['Tên Lớp'])),
     disabled=False, 
     key='1'
 )
@@ -96,12 +101,17 @@ course_option = placeholder.selectbox(
 if all_courses:
     placeholder.selectbox(
     'Class',
-    (list(course_df['Tên Lớp'])),
+    (list(courses_df['Tên Lớp'])),
     disabled=True, 
     key='2'
     )
-    st.table(course_df)
-
+    for i in range(len(courses_df)):
+        dates = courses_df['Diễn Giải'].to_list()[i].split("\n")[1].split("-")
+        dates = [date.strip() for date in dates]
+        
+        st.write(f"Commencement Date: {dates[0]}")
+        st.write(f"Ending Date: {dates[1]}")
+'''
 else:
     course_index = course_df.loc[course_df['Tên Lớp']==course_option].index.tolist()[0]+1
     siso_button = WebDriverWait(driver, 3).until(
@@ -115,3 +125,4 @@ else:
     # navigate to lop hoc
     driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc')
     st.table(temp_df)
+'''

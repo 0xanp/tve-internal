@@ -26,7 +26,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-@st.cache(allow_output_mutation=True)
 def load_options():
     # initialize the Chrome driver
     options = Options()

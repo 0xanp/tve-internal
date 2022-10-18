@@ -10,6 +10,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from datetime import datetime, timedelta
+import gc
 
 # getting credentials from environment variables
 load_dotenv()
@@ -137,12 +138,16 @@ if confirm:
                     class_date = f"{final_date[i]}, {class_date.strftime('%A')}"
                     filtered_dates.append(class_date)
                     st.success(course, icon="✅")
+        del [[course_df, midterm_name, midterm_date, final_date, final_name]]
+        gc.collect()
     df = pd.DataFrame()
     df['Course'] = filtered_courses
     df['Test'] = filtered_tests
     df['Date'] = filtered_dates
     df['Class Time'] = filtered_course_time
     df['Room'] = filtered_course_rooms
+    del [[filtered_courses, filtered_tests, filtered_dates, filtered_course_time, filtered_course_rooms]]
+    gc.collect()
     df = df.sort_values(by=['Date'])
     df = df.reset_index(drop=True)
     st.table(df)
@@ -160,3 +165,4 @@ if confirm:
             file_name=f'Test-Dates-from-{start_date}-to-{end_date}.xlsx',
             mime="application/vnd.ms-excel"
         )
+    
