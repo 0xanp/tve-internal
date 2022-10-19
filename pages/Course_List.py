@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime, timedelta
 from xlsxwriter import Workbook
+import gc
 # getting credentials from environment variables
 load_dotenv()
 MANAGER_USERNAME = os.getenv("MANAGER_USERNAME")
@@ -135,6 +136,8 @@ if all_courses:
         temp_date = temp_date[temp_date.find("(")+1:temp_date.find(")")]
         output_df.loc[output_df['Tên Lớp']==temp_name,('Diễn Giải')] = temp_date
         st.success(course.split('\n')[0],icon="✅")
+        del [[course_df, temp_name, temp_date, table_header, table_data]]
+        gc.collect()
     output_df = output_df.rename(columns={"Diễn Giải": "Giờ Học","Thời khóa biểu": "Ngày Học"})
     output_df['Midterm Dates'] = midterm_dates
     output_df['Final Dates'] = final_dates
@@ -157,4 +160,5 @@ if all_courses:
     st.write(f"Total No of Students: {output_df['Sĩ số'].sum()}")
     end_time = datetime.now()
     st.write('Duration: {}'.format(end_time - start_time))
-
+    del [[output_df, buffer, final_dates, midterm_dates]]
+    gc.collect()
