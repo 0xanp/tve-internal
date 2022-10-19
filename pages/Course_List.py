@@ -112,6 +112,7 @@ if all_courses:
     cond2 = cond2[cond2['Ending Date'] >= end_date]
     cond3 = courses_df[courses_df['Ending Date'].between(start_date, end_date)]
     output_df = pd.concat([cond1, cond2, cond3], ignore_index=True, sort=False)
+    del [[dates, ending, commencement, cond1, cond2, cond3]]
     final_dates = []
     midterm_dates = []
     for course in output_df['Tên Lớp']:
@@ -136,7 +137,7 @@ if all_courses:
         temp_date = temp_date[temp_date.find("(")+1:temp_date.find(")")]
         output_df.loc[output_df['Tên Lớp']==temp_name,('Diễn Giải')] = temp_date
         st.success(course.split('\n')[0],icon="✅")
-        del [[course_df, temp_name, temp_date, table_header, table_data]]
+        del [[temp_midterms, course_df, temp_name, temp_date, table_header, table_data]]
         gc.collect()
     output_df = output_df.rename(columns={"Diễn Giải": "Giờ Học","Thời khóa biểu": "Ngày Học"})
     output_df['Midterm Dates'] = midterm_dates
