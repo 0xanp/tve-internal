@@ -96,6 +96,10 @@ end_date = st.date_input('Select End Date', datetime.today() + timedelta(days=7)
 
 all_courses = st.button('Show All Course')
 
+refresh = st.button("Clear Cachce")
+if refresh:
+    st.experimental_singleton.clear()
+
 if all_courses:
     start_time = datetime.now()
     commencement = []
