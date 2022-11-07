@@ -28,7 +28,7 @@ def load_options():
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = GOOGLE_CHROME_BIN
-    #options.add_argument('--headless')
+    options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(chrome_options=options, executable_path=CHROMEDRIVER_PATH)
@@ -88,9 +88,9 @@ if uploaded_file is not None:
     confirm = st.button('Confirm adding course')
     if confirm:
         for i in range(len(data)):
-            #time.sleep(1)
+            time.sleep(1)
             driver.execute_script("baihoc_add()")
-            #time.sleep(1)
+            time.sleep(1)
             # Add ngay
             add_ngay = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
