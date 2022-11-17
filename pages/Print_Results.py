@@ -9,6 +9,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 from PyPDF2 import PdfFileMerger
 import streamlit as st
 
@@ -35,7 +37,7 @@ def load_options():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(chrome_options=options, executable_path=CHROMEDRIVER_PATH)
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
     #set up a second driver just for printing 
     temp_options = webdriver.ChromeOptions()
@@ -55,7 +57,7 @@ def load_options():
     temp_options.add_argument("--disable-dev-shm-usage")
     temp_options.add_argument("--no-sandbox")
     temp_options.add_argument('--headless')
-    temp_driver = webdriver.Chrome(chrome_options=temp_options, executable_path=CHROMEDRIVER_PATH)
+    temp_driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
@@ -80,6 +82,9 @@ def load_options():
 
     return driver, temp_driver, class_select
 
+refresh = st.button("Refresh")
+if refresh:
+    st.experimental_singleton.clear()
 driver, temp_driver, class_select = load_options()
 
 class_option = st.selectbox(
@@ -96,11 +101,6 @@ test_select = Select(WebDriverWait(driver, 2).until(
 test_option = st.selectbox(
     'Test',
     tuple([test.text for test in test_select.options]))
-
-refresh = st.button("Refresh List")
-
-if refresh:
-    st.experimental_singleton.clear()
 
 PDFbyte = bytes('', 'utf-8')
 placeholder = st.empty()

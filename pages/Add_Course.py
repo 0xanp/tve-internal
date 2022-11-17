@@ -9,6 +9,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
 # getting credentials from environment variables(streamlit secrets)
 load_dotenv()
@@ -32,7 +34,7 @@ def load_options():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(chrome_options=options, executable_path=CHROMEDRIVER_PATH)
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
@@ -74,6 +76,10 @@ def docx_to_data(file):
 
     return data
 
+refresh = st.button("Refresh")
+if refresh:
+    st.experimental_singleton.clear()
+
 driver, class_select = load_options()
 
 class_option = st.selectbox(
@@ -84,11 +90,6 @@ class_select.select_by_visible_text(class_option)
 
 uploaded_file = st.file_uploader("Choose a file")
 
-refresh = st.button("Refresh List")
-
-if refresh:
-    st.experimental_singleton.clear()
-
 if uploaded_file is not None:
     data = docx_to_data(uploaded_file)
     confirm = st.button('Confirm adding course')
@@ -98,14 +99,14 @@ if uploaded_file is not None:
             driver.execute_script("baihoc_add()")
             time.sleep(1)
             # Add ngay
-            add_ngay = WebDriverWait(driver, 2).until(
+            add_ngay = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
             add_ngay.clear()
             ngay = data[i]['DAYS'].split('\n')[1]
             add_ngay.send_keys(ngay, Keys.ENTER)
             # Add Lesson
             driver.switch_to.frame(0)
-            add_lesson = WebDriverWait(driver, 2).until(
+            add_lesson = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.XPATH,'/html/body')))
             add_lesson.click()
             lesson = f"{data[i]['UNITS']}\n{data[i]['PAGES']}\n{data[i]['LANGUAGE FOCUS']}"
