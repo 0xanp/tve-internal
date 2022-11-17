@@ -65,14 +65,14 @@ def load_options():
     # navigate to lop hoc
     driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc')
     # pulling the main table
-    table_header = WebDriverWait(driver, 2).until(
+    table_header = WebDriverWait(driver, 3).until(
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
-    table_data = WebDriverWait(driver, 2).until(
+    table_data = WebDriverWait(driver, 3).until(
                 EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
     courses_df = html_to_dataframe(table_header, table_data)
     # navigate to bai hoc
     driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc_baihoc')
-    course_select = Select(WebDriverWait(driver, 2).until(
+    course_select = Select(WebDriverWait(driver, 3).until(
             EC.element_to_be_clickable((By.XPATH,'//*[@id="idlophoc"]'))))
     courses = [course.text for course in course_select.options]
     
@@ -84,77 +84,69 @@ start_date = st.date_input('Select Start Date', datetime.today())
 
 end_date = st.date_input('Select End Date', datetime.today() + timedelta(days=7))
 
-course_option = st.selectbox(
-    'Course',
-    (list(courses_df['Tên Lớp'])),
-    disabled=False, 
-    key='1'
-)
-
 confirm = st.button('Get Test Dates')
 
 if confirm:
-    filtered_courses = []
-    filtered_tests = []
-    filtered_dates = []
-    filtered_course_time = []
-    filtered_course_rooms = []
-    for course in courses:
-        course_select.select_by_visible_text(course)
-        time.sleep(.75)
-        # pulling the main table
-        table_header = WebDriverWait(driver, 2).until(
-                    EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
-        table_data = WebDriverWait(driver, 2).until(
-                    EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
-        time.sleep(.75)
-        course_df = html_to_dataframe(table_header, table_data)
-        midterm_name = course_df[course_df['Bài học/Lesson'].str.match(r'MIDTERM TEST*') == True]['Bài học/Lesson'].to_list()
-        midterm_date = course_df[course_df['Bài học/Lesson'].str.match(r'MIDTERM TEST*') == True]['Ngày'].to_list()
-        final_name = course_df[course_df['Bài học/Lesson'].str.match(r'FINAL TEST*') == True]['Bài học/Lesson'].to_list()
-        final_date = course_df[course_df['Bài học/Lesson'].str.match(r'FINAL TEST*') == True]['Ngày'].to_list()
-        if midterm_date:
-            for i in range(len(midterm_date)):
-                class_date = datetime.strptime(midterm_date[i],'%d/%m/%Y').date()
-                if "CORRECTION" not in str(midterm_name[i]) and class_date <= end_date and class_date >= start_date:
-                    filtered_courses.append(course)
-                    filtered_tests.append(midterm_name[i])
-                    temp = courses_df[courses_df['Tên Lớp'].str.match(course)== True]['Diễn Giải'].values[0].split('-')
-                    course_time = f'{temp[0].split("Room")[0]}-{temp[1].split(")")[0]})'
-                    filtered_course_time.append(course_time)
-                    temp_1 = temp[2].split(" ")[1]
-                    temp_2 = temp[2].split(" ")[2].split("\n")[0]
-                    room = f'{temp[1].split(")")[1]}-{temp_1} {temp_2}'
-                    filtered_course_rooms.append(room)
-                    class_date = f"{midterm_date[i]}, {class_date.strftime('%A')}"
-                    filtered_dates.append(class_date)
-                    st.success(course, icon="✅")
-        if final_date:
-            for i in range(len(final_date)):
-                class_date = datetime.strptime(final_date[i],'%d/%m/%Y').date()
-                if  class_date <= end_date and class_date >= start_date:
-                    filtered_courses.append(course)
-                    filtered_tests.append(final_name[i])
-                    temp = courses_df[courses_df['Tên Lớp'].str.match(course)== True]['Diễn Giải'].values[0].split('-')
-                    course_time = f'{temp[0].split("Room")[0]}-{temp[1].split(")")[0]})'
-                    filtered_course_time.append(course_time)
-                    temp_1 = temp[2].split(" ")[1]
-                    temp_2 = temp[2].split(" ")[2].split("\n")[0]
-                    room = f'{temp[1].split(")")[1]}-{temp_1} {temp_2}'
-                    filtered_course_rooms.append(room)
-                    class_date = f"{final_date[i]}, {class_date.strftime('%A')}"
-                    filtered_dates.append(class_date)
-                    st.success(course, icon="✅")
-        del [[course_df, midterm_name, midterm_date, final_date, final_name]]
-        gc.collect()
+    try:
+        filtered_courses = []
+        filtered_tests = []
+        filtered_dates = []
+        filtered_course_time = []
+        filtered_course_rooms = []
+        for course in courses:
+            course_select.select_by_visible_text(course)
+            time.sleep(.5)
+            # pulling the main table
+            table_header = WebDriverWait(driver, 3).until(
+                        EC.presence_of_all_elements_located((By.XPATH,'//*[@id="dyntable"]/thead/tr/th')))
+            table_data = WebDriverWait(driver, 3).until(
+                        EC.presence_of_all_elements_located((By.XPATH,'//*[@id="showlist"]/tr')))
+            time.sleep(.5)
+            course_df = html_to_dataframe(table_header, table_data)
+            midterm_name = course_df[course_df['Bài học/Lesson'].str.match(r'MIDTERM TEST*') == True]['Bài học/Lesson'].to_list()
+            midterm_date = course_df[course_df['Bài học/Lesson'].str.match(r'MIDTERM TEST*') == True]['Ngày'].to_list()
+            final_name = course_df[course_df['Bài học/Lesson'].str.match(r'FINAL TEST*') == True]['Bài học/Lesson'].to_list()
+            final_date = course_df[course_df['Bài học/Lesson'].str.match(r'FINAL TEST*') == True]['Ngày'].to_list()
+            if midterm_date:
+                for i in range(len(midterm_date)):
+                    class_date = datetime.strptime(midterm_date[i],'%d/%m/%Y').date()
+                    if "CORRECTION" not in str(midterm_name[i]) and class_date <= end_date and class_date >= start_date:
+                        filtered_courses.append(course)
+                        filtered_tests.append(midterm_name[i])
+                        temp = courses_df[courses_df['Tên Lớp'].str.match(course)== True]['Diễn Giải'].values[0].split('-')
+                        course_time = f'{temp[0].split("Room")[0]}-{temp[1].split(")")[0]})'
+                        filtered_course_time.append(course_time)
+                        temp_1 = temp[2].split(" ")[1]
+                        temp_2 = temp[2].split(" ")[2].split("\n")[0]
+                        room = f'{temp[1].split(")")[1]}-{temp_1} {temp_2}'
+                        filtered_course_rooms.append(room)
+                        class_date = f"{midterm_date[i]}, {class_date.strftime('%A')}"
+                        filtered_dates.append(class_date)
+                        st.success(course, icon="✅")
+            if final_date:
+                for i in range(len(final_date)):
+                    class_date = datetime.strptime(final_date[i],'%d/%m/%Y').date()
+                    if  class_date <= end_date and class_date >= start_date:
+                        filtered_courses.append(course)
+                        filtered_tests.append(final_name[i])
+                        temp = courses_df[courses_df['Tên Lớp'].str.match(course)== True]['Diễn Giải'].values[0].split('-')
+                        course_time = f'{temp[0].split("Room")[0]}-{temp[1].split(")")[0]})'
+                        filtered_course_time.append(course_time)
+                        temp_1 = temp[2].split(" ")[1]
+                        temp_2 = temp[2].split(" ")[2].split("\n")[0]
+                        room = f'{temp[1].split(")")[1]}-{temp_1} {temp_2}'
+                        filtered_course_rooms.append(room)
+                        class_date = f"{final_date[i]}, {class_date.strftime('%A')}"
+                        filtered_dates.append(class_date)
+                        st.success(course, icon="✅")
+    except:
+        pass
     df = pd.DataFrame()
     df['Course'] = filtered_courses
     df['Test'] = filtered_tests
     df['Date'] = filtered_dates
     df['Class Time'] = filtered_course_time
     df['Room'] = filtered_course_rooms
-    del [[filtered_courses, filtered_tests, filtered_dates, filtered_course_time, filtered_course_rooms]]
-    gc.collect()
     df = df.sort_values(by=['Date'])
     df = df.reset_index(drop=True)
     st.table(df)
@@ -172,20 +164,6 @@ if confirm:
             file_name=f'Test-Dates-from-{start_date}-to-{end_date}.xlsx',
             mime="application/vnd.ms-excel"
         )
-'''
-else:
-    course_index = course_df.loc[course_df['Tên Lớp']==course_option].index.tolist()[0]+1
-    siso_button = WebDriverWait(driver, 3).until(
-                EC.element_to_be_clickable((By.XPATH, f'//*[@id="showlist"]/tr[{course_index}]/td[5]/a[1]')))
-    driver.execute_script("arguments[0].click();", siso_button)
-    table_header = WebDriverWait(driver, 3).until(
-                EC.presence_of_all_elements_located((By.XPATH,'//*[@id="static"]/thead/tr/th')))
-    table_data = WebDriverWait(driver, 3).until(
-                EC.presence_of_all_elements_located((By.XPATH,'//*[@id="ctl10_container"]/tr')))
-    temp_df = html_to_dataframe(table_header, table_data)
-    # navigate to lop hoc
-    driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc')
-    st.table(temp_df)
-'''
+
 
     
