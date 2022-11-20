@@ -16,8 +16,6 @@ from bs4 import BeautifulSoup
 load_dotenv()
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
-DOWNLOAD_PATH = r'{}'.format(os.getenv("DOWNLOAD_PATH"))
-STUDENT_LISTS_PATH = r'{}'.format(os.getenv("STUDENT_LISTS_PATH"))
 GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")
 
 st.set_page_config(
@@ -32,7 +30,7 @@ def load_data():
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = GOOGLE_CHROME_BIN
-    options.add_argument('--headless')
+    #options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
@@ -46,12 +44,12 @@ def load_data():
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
     driver.get("https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc")
-    time.sleep(1)
+    time.sleep(2)
     soup = BeautifulSoup(driver.page_source,"lxml")
     classes = {}
     class_titles = soup.find('tbody').find_all('tr')
     for class_title in class_titles:
-        classes[[c.text for c in class_title][1]] = [c for c in class_title]
+        classes[[c.text for c in class_title][1]] = [c['href'] for c in class_title.find_all(title="Xem danh sách lớp học")][0]
     return driver, classes, soup
 
 refresh = st.button("Refresh")
@@ -67,5 +65,12 @@ class_option = st.selectbox(
 confirm = st.button('Select')
 
 if confirm:
-    st.write(class_option)
-    st.write(classes[class_option])
+    st.write(class_option, classes[class_option])
+    driver.execute_script(classes[class_option])
+    time.sleep(2)
+    student_soup = BeautifulSoup(driver.page_source, "lxml")
+    table = [soup.find_all('tr') for soup in student_soup.find_all("tbody")][1]
+    rows= [row.find_all('td') for row in table]
+    students = [student[2].text for student in rows]
+    st.write(students)
+
