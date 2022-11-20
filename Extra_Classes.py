@@ -58,19 +58,28 @@ if refresh:
 
 driver, classes, soup = load_data()
 
-class_option = st.selectbox(
-    'Class',
-    tuple(classes.keys()))
+options = st.multiselect(
+    'Select your classes:',
+    classes.keys(),
+    list(classes.keys())[-1])
 
-confirm = st.button('Select')
+
+placeholder = st.empty()
+
+if options:
+    confirm = placeholder.button('Select', key = 1)
+else:
+    confirm = placeholder.button('Select', disabled=True, key = 2)
 
 if confirm:
-    st.write(class_option, classes[class_option])
-    driver.execute_script(classes[class_option])
-    time.sleep(2)
-    student_soup = BeautifulSoup(driver.page_source, "lxml")
-    table = [soup.find_all('tr') for soup in student_soup.find_all("tbody")][1]
-    rows= [row.find_all('td') for row in table]
-    students = [student[2].text for student in rows]
-    st.write(students)
+    for option in options:
+        st.write(option)
+        driver.execute_script(classes[option])
+        time.sleep(2)
+        student_soup = BeautifulSoup(driver.page_source, "lxml")
+        table = [soup.find_all('tr') for soup in student_soup.find_all("tbody")][1]
+        rows= [row.find_all('td') for row in table]
+        students = [student[2].text for student in rows]
+        st.write(students)
+        placeholder.empty()
 
