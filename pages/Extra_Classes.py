@@ -5,11 +5,12 @@ from dotenv import load_dotenv
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
-from pathlib import Path
+import openpyxl
+from io import BytesIO
+from openpyxl.styles import Font
 from bs4 import BeautifulSoup
 
 # getting credentials from environment variables
@@ -18,11 +19,53 @@ ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")
 
+if 'data' not in st.session_state:
+    st.session_state.data = []
+    st.session_state.option = []
+
 st.set_page_config(
     page_title="Tri Viet Education",
     page_icon=":pager:",
     initial_sidebar_state="expanded",
 )
+
+def write_to_excel(class_name, students):
+    output = BytesIO()
+    wb_obj = openpyxl.load_workbook("TUTORING COURSE OUTLINE - KET 1.xlsx")
+    sheet_obj = wb_obj.active 
+    # modify title into appropriate class
+    name = sheet_obj.cell(row = 1, column = 1) 
+    name.value = f'{class_name} - EXTRA CLASS'
+    # modify student columns
+    # col pointer starts at 3 (hard coded atm)
+    col_pointer = 4
+    # setting student detail font to bold
+    student_font = Font(name="Time News Roman", size=12, bold=True)
+    for i, student in enumerate(students):
+        # writing student index
+        index_cell = sheet_obj.cell(2,col_pointer)
+        index_cell.value = i + 1
+        index_cell.font = student_font
+        # writing students' names
+        if type(sheet_obj.cell(3, col_pointer)).__name__ == 'MergedCell':
+            student_cell = sheet_obj.unmerge_cells(start_row=3,start_column=col_pointer, end_row=3, end_column=col_pointer+2)
+        student_cell = sheet_obj.cell(3,col_pointer)
+        student_cell.value = student
+        student_cell.font = student_font
+        student_cell = sheet_obj.merge_cells(start_row=3,start_column=col_pointer, end_row=3, end_column=col_pointer+2)
+        # writing skill cells
+        listening_cell = sheet_obj.cell(4,col_pointer)
+        listening_cell.value = "List."
+        listening_cell.font = student_font
+        reading_writing_cell = sheet_obj.cell(4,col_pointer+1)
+        reading_writing_cell.value = "R&W"
+        reading_writing_cell.font = student_font
+        vocab_cell = sheet_obj.cell(4,col_pointer+2)
+        vocab_cell.value = "Vocab"
+        vocab_cell.font = student_font
+        col_pointer = col_pointer+3
+    wb_obj.save(output)
+    return output.getvalue()
 
 @st.experimental_singleton
 def load_data():
@@ -30,7 +73,7 @@ def load_data():
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = GOOGLE_CHROME_BIN
-    #options.add_argument('--headless')
+    options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
@@ -71,15 +114,24 @@ if options:
 else:
     confirm = placeholder.button('Select', disabled=True, key = 2)
 
+data = {}
+
 if confirm:
+    st.session_state.data = []
+    st.session_state.option = []
     for option in options:
-        st.write(option)
         driver.execute_script(classes[option])
         time.sleep(2)
         student_soup = BeautifulSoup(driver.page_source, "lxml")
         table = [soup.find_all('tr') for soup in student_soup.find_all("tbody")][1]
         rows= [row.find_all('td') for row in table]
         students = [student[2].text for student in rows]
-        st.write(students)
-        placeholder.empty()
+        st.session_state.data.append(write_to_excel(option, students))
+        st.session_state.option.append(option)
+    placeholder.empty()
+
+for i in range(len(st.session_state.data)):
+    st.download_button(label=f'📥 Download {st.session_state.option[i]}',
+                        data=st.session_state.data[i],
+                        file_name= f'{st.session_state.option[i]}-EXTRA CLASS.xlsx')
 
