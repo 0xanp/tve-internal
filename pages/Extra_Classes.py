@@ -32,7 +32,7 @@ st.set_page_config(
 
 def write_to_excel(class_name, students):
     output = BytesIO()
-    wb_obj = openpyxl.load_workbook("pages/TUTORING COURSE OUTLINE - KET 1.xlsx")
+    wb_obj = openpyxl.load_workbook("TUTORING COURSE OUTLINE.xlsx")
     sheet_obj = wb_obj.active 
     # modify title into appropriate class
     name = sheet_obj.cell(row = 1, column = 1) 
