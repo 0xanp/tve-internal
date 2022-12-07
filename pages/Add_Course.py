@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
 
 # getting credentials from environment variables(streamlit secrets)
 load_dotenv()
@@ -76,8 +77,7 @@ def docx_to_data(file):
 
     return data
 
-refresh = st.button("Refresh")
-if refresh:
+if st.button("Refresh"):
     st.experimental_singleton.clear()
 
 driver, class_select = load_options()
@@ -88,30 +88,41 @@ class_option = st.selectbox(
 
 class_select.select_by_visible_text(class_option)
 
-uploaded_file = st.file_uploader("Choose a file")
-
-if uploaded_file is not None:
-    data = docx_to_data(uploaded_file)
-    confirm = st.button('Confirm adding course')
-    if confirm:
-        for i in range(len(data)):
-            time.sleep(1)
-            driver.execute_script("baihoc_add()")
-            time.sleep(1)
-            # Add ngay
-            add_ngay = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
-            add_ngay.clear()
-            ngay = data[i]['DAYS'].split('\n')[1]
-            add_ngay.send_keys(ngay, Keys.ENTER)
-            # Add Lesson
-            driver.switch_to.frame(0)
-            add_lesson = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH,'/html/body')))
-            add_lesson.click()
-            lesson = f"{data[i]['UNITS']}\n{data[i]['PAGES']}\n{data[i]['LANGUAGE FOCUS']}"
-            add_lesson.send_keys(lesson)
-            driver.switch_to.default_content()
-            # Submit
-            driver.execute_script("checkform()")
-            st.success(f"{class_option}-{ngay}", icon="✅")
+baihoc_soup = BeautifulSoup(driver.page_source, "lxml")
+hrefs = [delete.a['href'] for delete in baihoc_soup.find_all("li")[17::2]]
+if hrefs:
+    st.error('This will delete the entire course outline for this class', icon="⚠️")
+    if st.button("Delete"):
+        with st.spinner('Deleting...'):  
+            for href in hrefs:
+                st.write(href)
+        st.success("Finished deleting")
+else:
+    uploaded_file = st.file_uploader("Choose a file")
+    if uploaded_file is not None:
+        data = docx_to_data(uploaded_file)
+        confirm = st.button('Confirm adding course')
+        if confirm:
+            with st.spinner('Adding...'):
+                for i in range(len(data)):
+                    time.sleep(1)
+                    driver.execute_script("baihoc_add()")
+                    time.sleep(1)
+                    # Add ngay
+                    add_ngay = WebDriverWait(driver, 20).until(
+                        EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
+                    add_ngay.clear()
+                    ngay = data[i]['DAYS'].split('\n')[1]
+                    add_ngay.send_keys(ngay, Keys.ENTER)
+                    # Add Lesson
+                    driver.switch_to.frame(0)
+                    add_lesson = WebDriverWait(driver, 20).until(
+                        EC.element_to_be_clickable((By.XPATH,'/html/body')))
+                    add_lesson.click()
+                    lesson = f"{data[i]['UNITS']}\n{data[i]['PAGES']}\n{data[i]['LANGUAGE FOCUS']}"
+                    add_lesson.send_keys(lesson)
+                    driver.switch_to.default_content()
+                    # Submit
+                    driver.execute_script("checkform()")
+                    st.success(f"{class_option}-{ngay}", icon="✅")
+                st.experimental_singleton.clear()

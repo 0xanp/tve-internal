@@ -7,7 +7,6 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support import expected_conditions as EC
 import openpyxl
 from io import BytesIO
 from openpyxl.styles import Font
@@ -78,7 +77,6 @@ def load_data():
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
-
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
