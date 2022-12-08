@@ -95,6 +95,8 @@ if hrefs:
     if st.button("Delete"):
         with st.spinner('Deleting...'):  
             for href in hrefs:
+                driver.execute_script(href)
+                time.sleep(.5)
                 st.write(href)
         st.success("Finished deleting")
 else:
