@@ -67,7 +67,7 @@ def write_to_excel(class_name, students):
     wb_obj.save(output)
     return output.getvalue()
 
-@st.experimental_singleton
+#@st.experimental_singleton
 def load_data():
     # initialize the Chrome driver
     options = Options()
@@ -94,9 +94,8 @@ def load_data():
         classes[[c.text for c in class_title][1]] = [c['href'] for c in class_title.find_all(title="Xem danh sách lớp học")][0]
     return driver, classes, soup
 
-refresh = st.button("Refresh")
-if refresh:
-    st.experimental_singleton.clear()
+#if st.button("Refresh"):
+#    st.experimental_singleton.clear()
 
 driver, classes, soup = load_data()
 

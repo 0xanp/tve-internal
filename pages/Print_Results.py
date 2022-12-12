@@ -28,7 +28,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-@st.experimental_singleton
+#@st.experimental_singleton
 def load_options():
     # initialize the Chrome driver
     options = Options()
@@ -82,9 +82,8 @@ def load_options():
 
     return driver, temp_driver, class_select
 
-refresh = st.button("Refresh")
-if refresh:
-    st.experimental_singleton.clear()
+#if st.button("Refresh"):
+#    st.experimental_singleton.clear()
 driver, temp_driver, class_select = load_options()
 
 class_option = st.selectbox(
@@ -144,4 +143,5 @@ if printing:
         os.remove(f)
     placeholder.button('Confirm and Print', disabled=False, key='3')
     placeholder.empty()
+    #st.experimental_singleton.clear()
 

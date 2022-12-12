@@ -18,7 +18,7 @@ CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH")
 GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")
 
 
-@st.experimental_singleton
+#@st.experimental_singleton
 def load_data():
     # initialize the Chrome driver
     options = Options()
@@ -53,8 +53,8 @@ def load_data():
         classes[[c.text for c in class_title][1]] = [c['href'] for c in class_title.find_all(title="Xem danh sách lớp học")][0]
     return driver, helper_driver, classes, soup
 
-if st.button("Refresh"):
-    st.experimental_singleton.clear()
+#if st.button("Refresh"):
+#    st.experimental_singleton.clear()
 
 driver, helper_driver, classes, soup = load_data()
 
