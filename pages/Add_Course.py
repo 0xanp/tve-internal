@@ -88,8 +88,11 @@ class_option = st.selectbox(
 
 class_select.select_by_visible_text(class_option)
 
+time.sleep(2)
+
 baihoc_soup = BeautifulSoup(driver.page_source, "lxml")
 hrefs = [delete.a['href'] for delete in baihoc_soup.find_all("li")[17::2]]
+st.write(hrefs)
 if hrefs:
     st.error('This will delete the entire course outline for this class', icon="⚠️")
     if st.button("Delete"):
