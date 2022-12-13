@@ -67,7 +67,7 @@ def write_to_excel(class_name, students):
     wb_obj.save(output)
     return output.getvalue()
 
-#@st.experimental_singleton
+@st.experimental_singleton
 def load_data():
     # initialize the Chrome driver
     options = Options()

@@ -26,7 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-#@st.experimental_singleton
+@st.experimental_singleton
 def load_options():
     # initialize the Chrome driver
     options = Options()
@@ -77,8 +77,8 @@ def docx_to_data(file):
 
     return data
 
-#if st.button("Refresh"):
-#    st.experimental_singleton.clear()
+if st.button("Refresh"):
+    st.experimental_singleton.clear()
 
 driver, class_select = load_options()
 
@@ -99,6 +99,7 @@ if hrefs:
                 time.sleep(.5)
                 st.write(href)
         st.success("Finished deleting")
+        st.experimental_singleton.clear()
 else:
     uploaded_file = st.file_uploader("Choose a file")
     if uploaded_file is not None:
@@ -127,4 +128,4 @@ else:
                     # Submit
                     driver.execute_script("checkform()")
                     st.success(f"{class_option}-{ngay}", icon="✅")
-#                st.experimental_singleton.clear()
+                st.experimental_singleton.clear()
