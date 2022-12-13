@@ -94,8 +94,8 @@ def load_data():
         classes[[c.text for c in class_title][1]] = [c['href'] for c in class_title.find_all(title="Xem danh sách lớp học")][0]
     return driver, classes, soup
 
-#if st.button("Refresh"):
-#    st.experimental_singleton.clear()
+if st.button("Refresh"):
+    st.experimental_singleton.clear()
 
 driver, classes, soup = load_data()
 
