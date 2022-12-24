@@ -32,7 +32,7 @@ def load_options():
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = GOOGLE_CHROME_BIN
-    options.add_argument('--headless')
+    #options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
@@ -97,6 +97,9 @@ if hrefs:
             for href in hrefs:
                 driver.execute_script(href)
                 time.sleep(.5)
+                ok_button = WebDriverWait(driver, 20).until(
+                        EC.element_to_be_clickable((By.XPATH,'//*[@id="popup_ok"]')))
+                ok_button.click()
                 st.write(href)
         st.success("Finished deleting")
         st.experimental_singleton.clear()
