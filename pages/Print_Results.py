@@ -28,7 +28,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-@st.experimental_singleton
+@st.cache_resource
 def load_options():
     # initialize the Chrome driver
     options = Options()
@@ -60,7 +60,7 @@ def load_options():
     temp_driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
     # login page
-    driver.get("https://trivietedu.ileader.vn/login.aspx")
+    driver.get("https://trivietedu-old.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
     driver.find_element("id","user").send_keys(MANAGER_USERNAME)
     # find password input field and insert password as well
@@ -143,5 +143,5 @@ if printing:
         os.remove(f)
     placeholder.button('Confirm and Print', disabled=False, key='3')
     placeholder.empty()
-    st.experimental_singleton.clear()
+    st.cache_resource.clear()
 

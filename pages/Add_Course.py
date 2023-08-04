@@ -26,7 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-@st.experimental_singleton
+@st.cache_resource
 def load_options():
     # initialize the Chrome driver
     options = Options()
@@ -38,7 +38,7 @@ def load_options():
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
     # login page
-    driver.get("https://trivietedu.ileader.vn/login.aspx")
+    driver.get("https://trivietedu-old.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
     driver.find_element("id","user").send_keys(MANAGER_USERNAME)
     # find password input field and insert password as well
@@ -46,7 +46,7 @@ def load_options():
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
 
-    driver.get('https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc_baihoc')
+    driver.get('https://trivietedu-old.ileader.vn/Default.aspx?mod=lophoc!lophoc_baihoc')
 
     class_select = Select(WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH,'//*[@id="idlophoc"]'))))
@@ -131,4 +131,4 @@ else:
                     # Submit
                     driver.execute_script("checkform()")
                     st.success(f"{class_option}-{ngay}", icon="✅")
-                st.experimental_singleton.clear()
+                st.cache_resource.clear()

@@ -18,7 +18,7 @@ CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH")
 GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")
 
 
-@st.experimental_singleton
+@st.cache_resource
 def load_data():
     # initialize the Chrome driver
     options = Options()
@@ -54,7 +54,7 @@ def load_data():
     return driver, helper_driver, classes, soup
 
 if st.button("Refresh"):
-    st.experimental_singleton.clear()
+    st.cache_resource.clear()
 
 driver, helper_driver, classes, soup = load_data()
 

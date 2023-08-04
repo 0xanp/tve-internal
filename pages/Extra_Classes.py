@@ -67,7 +67,7 @@ def write_to_excel(class_name, students):
     wb_obj.save(output)
     return output.getvalue()
 
-@st.experimental_singleton
+@st.cache_resource
 def load_data():
     # initialize the Chrome driver
     options = Options()
@@ -78,14 +78,14 @@ def load_data():
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
     # login page
-    driver.get("https://trivietedu.ileader.vn/login.aspx")
+    driver.get("https://trivietedu-old.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
     driver.find_element("id","user").send_keys(MANAGER_USERNAME)
     # find password input field and insert password as well
     driver.find_element("id","pass").send_keys(MANAGER_PASSWORD)
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
-    driver.get("https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc")
+    driver.get("https://trivietedu-old.ileader.vn/Default.aspx?mod=lophoc!lophoc")
     time.sleep(2)
     soup = BeautifulSoup(driver.page_source,"lxml")
     classes = {}
@@ -95,7 +95,7 @@ def load_data():
     return driver, classes, soup
 
 if st.button("Refresh"):
-    st.experimental_singleton.clear()
+    st.cache_resource.clear()
 
 driver, classes, soup = load_data()
 
