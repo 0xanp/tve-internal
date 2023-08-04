@@ -76,7 +76,7 @@ def load_data():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
     # login page
     driver.get("https://trivietedu-old.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field

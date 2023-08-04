@@ -37,7 +37,7 @@ def load_options():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
 
     #set up a second driver just for printing 
     temp_options = webdriver.ChromeOptions()
@@ -57,7 +57,7 @@ def load_options():
     temp_options.add_argument("--disable-dev-shm-usage")
     temp_options.add_argument("--no-sandbox")
     temp_options.add_argument('--headless')
-    temp_driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+    temp_driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
 
     # login page
     driver.get("https://trivietedu-old.ileader.vn/login.aspx")
