@@ -32,7 +32,7 @@ def load_options():
     options = Options()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = GOOGLE_CHROME_BIN
-    options.add_argument('--headless')
+    #options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
@@ -78,7 +78,7 @@ def docx_to_data(file):
     return data
 
 if st.button("Refresh"):
-    st.experimental_singleton.clear()
+    st.cache_resource.clear()
 
 driver, class_select = load_options()
 
@@ -89,7 +89,7 @@ class_option = st.selectbox(
 class_select.select_by_visible_text(class_option)
 time.sleep(1.5)
 baihoc_soup = BeautifulSoup(driver.page_source, "lxml")
-hrefs = [delete.a['href'] for delete in baihoc_soup.find_all("li")[17::2]]
+hrefs = [delete.a['href'] for delete in baihoc_soup.find_all("li")[22::2]]
 if hrefs:
     st.error('This will delete the entire course outline for this class', icon="⚠️")
     if st.button("Delete"):
@@ -102,7 +102,7 @@ if hrefs:
                 ok_button.click()
                 st.write(href)
         st.success("Finished deleting")
-        st.experimental_singleton.clear()
+        st.cache_resource.clear()
 else:
     uploaded_file = st.file_uploader("Choose a file")
     if uploaded_file is not None:
@@ -111,9 +111,9 @@ else:
         if confirm:
             with st.spinner('Adding...'):
                 for i in range(len(data)):
-                    time.sleep(1)
+                    time.sleep(2)
                     driver.execute_script("baihoc_add()")
-                    time.sleep(1)
+                    time.sleep(2)
                     # Add ngay
                     add_ngay = WebDriverWait(driver, 20).until(
                         EC.element_to_be_clickable((By.XPATH,'//*[@id="zLophoc_baihoc_ngay"]')))
