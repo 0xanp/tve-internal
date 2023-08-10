@@ -68,6 +68,9 @@ def load_options():
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
 
+    driver.get("https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!nhapdiem")
+    
+    """
     # click lop hoc
     lop_hoc_button = WebDriverWait(driver, 2).until(
             EC.presence_of_element_located((By.XPATH,'//*[@id="content"]/section/section/section/section/div/div[1]/div[1]/div/div[4]/a')))
@@ -77,13 +80,15 @@ def load_options():
     nhap_diem_button = WebDriverWait(driver, 2).until(
             EC.presence_of_element_located((By.XPATH,'//*[@id="menutop_nhapdiem"]/a/span[2]/span')))
     nhap_diem_button.click() 
+    """
     class_select = Select(WebDriverWait(driver, 2).until(
                 EC.presence_of_element_located((By.XPATH,'//*[@id="cp_lophoc"]'))))
 
     return driver, temp_driver, class_select
 
 if st.button("Refresh"):
-    st.experimental_singleton.clear()
+    st.cache_resource.clear()
+
 driver, temp_driver, class_select = load_options()
 
 class_option = st.selectbox(
@@ -100,13 +105,12 @@ test_select = Select(WebDriverWait(driver, 2).until(
 test_option = st.selectbox(
     'Test',
     tuple([test.text for test in test_select.options]))
-
+test_select.select_by_visible_text(test_option)
 PDFbyte = bytes('', 'utf-8')
 placeholder = st.empty()
 printing = placeholder.button('Confirm and Print',disabled=False, key='1')
 if printing:
-    placeholder.button('Confirm and Print', disabled=True, key='2')
-    test_select.select_by_visible_text(test_option)
+    placeholder.button('Confirm and Print', disabled=True, key='2') 
     time.sleep(2)
     rows = driver.find_elements(By.XPATH,"//table/tbody/tr")
     st.write("Combining", len(rows)-1)
@@ -144,4 +148,3 @@ if printing:
     placeholder.button('Confirm and Print', disabled=False, key='3')
     placeholder.empty()
     st.cache_resource.clear()
-
