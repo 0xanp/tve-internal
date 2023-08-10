@@ -86,12 +86,14 @@ def load_data():
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
     driver.get("https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc")
-    time.sleep(2)
+    time.sleep(15)
     soup = BeautifulSoup(driver.page_source,"lxml")
     classes = {}
     class_titles = soup.find('tbody').find_all('tr')
+    st.write(class_titles)
     for class_title in class_titles:
         classes[[c.text for c in class_title][1]] = [c['href'] for c in class_title.find_all(title="Xem danh sách lớp học")][0]
+    st.write(classes)
     return driver, classes, soup
 
 if st.button("Refresh"):
