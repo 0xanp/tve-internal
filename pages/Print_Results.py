@@ -60,7 +60,7 @@ def load_options():
     temp_driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
 
     # login page
-    driver.get("https://trivietedu-old.ileader.vn/login.aspx")
+    driver.get("https://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
     driver.find_element("id","user").send_keys(MANAGER_USERNAME)
     # find password input field and insert password as well
