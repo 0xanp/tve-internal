@@ -116,7 +116,7 @@ dir_list = os.listdir(path)
 
 driver, class_select = load_options()
 
-class_option = st.selectbox(
+class_option = st.selectbox(dr
     'Class',
     tuple([class_name.text for class_name in class_select.options]))
 
