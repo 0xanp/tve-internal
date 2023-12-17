@@ -111,6 +111,9 @@ def docx_to_data(file):
 
     return data
 
+path = "COURSE OUTLINE/COURSE OUTLINE/"
+dir_list = os.listdir(path)
+
 driver, class_select = load_options()
 
 class_option = st.selectbox(
