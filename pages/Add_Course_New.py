@@ -111,20 +111,6 @@ def docx_to_data(file):
 
     return data
 
-path = "COURSE OUTLINE/COURSE OUTLINE/"
-dir_list = os.listdir(path)
-for dir in dir_list:
-    file_list = os.listdir(path+dir)
-    for f in file_list:
-        try:
-        #if "".join(class_option.split("-")[0].split(" ")[:2]).upper() == "".join(f.split(" ")[:2]).upper():
-            selected_course_path = path+dir+"/"+f
-            st.write(selected_course_path)
-            st.write(pd.DataFrame(docx_to_data(selected_course_path))[['DAYS','UNITS','PAGES','LANGUAGE FOCUS']])
-        except:
-            st.write(f)
-            pass
-
 driver, class_select = load_options()
 
 class_option = st.selectbox(
