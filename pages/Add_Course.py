@@ -35,7 +35,7 @@ def load_options():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))#version="114.0.5735.16").install()))
 
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
@@ -73,8 +73,9 @@ def docx_to_data(file):
         
         row_data = dict(zip(keys, text))
         if 'DAYS' in row_data.keys() and row_data['DAYS'] != 'DAYS':
+            st.write("appended")
             data.append(row_data)
-
+    st.write(data)
     return data
 
 if st.button("Refresh"):
@@ -107,6 +108,7 @@ else:
     uploaded_file = st.file_uploader("Choose a file")
     if uploaded_file is not None:
         data = docx_to_data(uploaded_file)
+        st.write(data)
         confirm = st.button('Confirm adding course')
         if confirm:
             with st.spinner('Adding...'):

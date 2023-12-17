@@ -11,6 +11,7 @@ import openpyxl
 from io import BytesIO
 from openpyxl.styles import Font
 from bs4 import BeautifulSoup
+import pandas as pd
 
 # getting credentials from environment variables
 load_dotenv()
@@ -76,7 +77,7 @@ def load_data():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
@@ -88,6 +89,9 @@ def load_data():
     driver.get("https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc")
     time.sleep(15)
     soup = BeautifulSoup(driver.page_source,"lxml")
+    table_elem = soup.find('table')
+    df = pd.read_html(table_elem.prettify())[0]
+    df.to_csv("classes.csv")
     classes = {}
     class_titles = soup.find('tbody').find_all('tr')
     st.write(class_titles)
@@ -104,7 +108,7 @@ driver, classes, soup = load_data()
 options = st.multiselect(
     'Select your classes:',
     classes.keys(),
-    list(classes.keys())[-1])
+    list(classes.keys()))
 
 
 placeholder = st.empty()
@@ -119,15 +123,23 @@ data = {}
 if confirm:
     st.session_state.data = []
     st.session_state.option = []
+    df = pd.DataFrame()
     for option in options:
         driver.execute_script(classes[option])
-        time.sleep(2)
+        time.sleep(.5)
         student_soup = BeautifulSoup(driver.page_source, "lxml")
-        table = [soup.find_all('tr') for soup in student_soup.find_all("tbody")][1]
-        rows= [row.find_all('td') for row in table]
-        students = [student[2].text for student in rows]
-        st.session_state.data.append(write_to_excel(option, students))
-        st.session_state.option.append(option)
+        #table = [soup.find_all('tr') for soup in student_soup.find_all("tbody")][1]
+        #rows= [row.find_all('td') for row in table]
+        table_elem = student_soup.find_all('table')[1]
+        temp_df = pd.read_html(table_elem.prettify())[0]
+        temp_df['Class'] = [option]*len(temp_df)
+        df = pd.concat([df, temp_df])
+        #students = [student[2].text for student in rows]
+        #st.session_state.data.append(write_to_excel(option, students))
+        #st.session_state.option.append(option)
+    df = df.reset_index()
+    df.index += 1
+    df.to_csv("students.csv")
     placeholder.empty()
 
 for i in range(len(st.session_state.data)):
