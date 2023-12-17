@@ -31,7 +31,7 @@ def load_options():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))#version="114.0.5735.16").install()))
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))#version="114.0.5735.16").install()))
     # login page
     driver.get("https://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
@@ -116,7 +116,7 @@ dir_list = os.listdir(path)
 
 driver, class_select = load_options()
 
-class_option = st.selectbox(dr
+class_option = st.selectbox(
     'Class',
     tuple([class_name.text for class_name in class_select.options]))
 
