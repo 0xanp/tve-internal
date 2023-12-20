@@ -37,7 +37,8 @@ def load_options():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
+    options.add_argument("--ignore-certificate-errors")
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
     #set up a second driver just for printing 
     temp_options = webdriver.ChromeOptions()
@@ -57,10 +58,11 @@ def load_options():
     temp_options.add_argument("--disable-dev-shm-usage")
     temp_options.add_argument("--no-sandbox")
     temp_options.add_argument('--headless')
-    temp_driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(version="114.0.5735.16").install()))
+    temp_options.add_argument("--ignore-certificate-errors")
+    temp_driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
     # login page
-    driver.get("https://trivietedu.ileader.vn/login.aspx")
+    driver.get("http://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
     driver.find_element("id","user").send_keys(MANAGER_USERNAME)
     # find password input field and insert password as well
@@ -68,7 +70,7 @@ def load_options():
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
 
-    driver.get("https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!nhapdiem")
+    driver.get("http://trivietedu.ileader.vn/Default.aspx?mod=lophoc!nhapdiem")
     
     """
     # click lop hoc
