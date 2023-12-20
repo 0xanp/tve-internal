@@ -77,16 +77,17 @@ def load_data():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
+    options.add_argument("--ignore-certificate-errors")
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
     # login page
-    driver.get("https://trivietedu.ileader.vn/login.aspx")
+    driver.get("http://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
     driver.find_element("id","user").send_keys(MANAGER_USERNAME)
     # find password input field and insert password as well
     driver.find_element("id","pass").send_keys(MANAGER_PASSWORD)
     # click login button
     driver.find_element(By.XPATH,'//*[@id="login"]/button').click()
-    driver.get("https://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc")
+    driver.get("http://trivietedu.ileader.vn/Default.aspx?mod=lophoc!lophoc")
     time.sleep(15)
     soup = BeautifulSoup(driver.page_source,"lxml")
     table_elem = soup.find('table')
