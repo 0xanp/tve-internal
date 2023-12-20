@@ -31,6 +31,7 @@ def load_options():
     options.add_argument('--headless')
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
+    options.add_argument("--ignore-certificate-errors")
     driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))#version="114.0.5735.16").install()))
     # login page
     driver.get("http://trivietedu.ileader.vn/login.aspx")
