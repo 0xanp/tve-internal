@@ -73,7 +73,12 @@ def generate_dates(start_date, num_dates, target_days):
                 "13/02/2024",
                 "14/02/2024",
                 "15/02/2024",
-                "16/02/2024"]  # Add more holidays as needed
+                "16/02/2024",
+                "18/04/2024",
+                "30/04/2024",
+                "01/05/2024",
+                "02/09/2024",
+                "03/09/2024"]  # Add more holidays as needed
 
     target_day_nums = [days_mapping.get(day.lower()) for day in target_days]
     if None in target_day_nums:
@@ -143,11 +148,11 @@ else:
     for dir in dir_list:
         file_list = os.listdir(path+dir)
         for f in file_list:
-            if "".join(class_option.split("-")[0].split(" ")[:2]).upper() == "".join(f.split(" ")[:2]).upper():
+            if "".join(f.split(" ")[:2]).upper() == "FOUNDATION1":#"".join(class_option.split("-")[0].split(" ")[:2]).upper() == "".join(f.split(" ")[:2]).upper():
                 selected_course_path = path+dir+"/"+f
-    #st.write(selected_course_path)
+    st.write(selected_course_path)
     course_df = pd.DataFrame(docx_to_data(selected_course_path))
-
+    st.write(course_df)
     # Create a form for user input
     with st.form("date_generator_form"):
         start_date = st.date_input("Select start date:", datetime.today())
