@@ -148,11 +148,9 @@ else:
     for dir in dir_list:
         file_list = os.listdir(path+dir)
         for f in file_list:
-            if "".join(f.split(" ")[:2]).upper() == "FOUNDATION1":#"".join(class_option.split("-")[0].split(" ")[:2]).upper() == "".join(f.split(" ")[:2]).upper():
+            if "".join(class_option.split("-")[0].split(" ")[:2]).upper() == "".join(f.split(" ")[:2]).upper():
                 selected_course_path = path+dir+"/"+f
-    st.write(selected_course_path)
     course_df = pd.DataFrame(docx_to_data(selected_course_path))
-    st.write(course_df)
     # Create a form for user input
     with st.form("date_generator_form"):
         start_date = st.date_input("Select start date:", datetime.today())
@@ -170,6 +168,7 @@ else:
         result = generate_dates(start_date, len(course_df) , target_days_lower)
         result = [date[0].strftime('%d/%m/%Y') for date in result]
         course_df['DAYS'] = result
+        st.write(course_df)
 
         with st.spinner('Adding...'):
             for i in range(len(course_df)):
