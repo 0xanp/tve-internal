@@ -3,7 +3,7 @@ numpy==1.26.4
 PyPDF2==2.11.1
 python-docx==0.8.11
 python-dotenv==0.21.0
-selenium==4.5.0
+selenium==4.25.0
 streamlit==1.38.0
 xlsxwriter==3.0.3
 webdriver-manager==4.0.0
