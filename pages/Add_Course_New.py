@@ -32,7 +32,7 @@ def load_options():
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     options.add_argument("--ignore-certificate-errors")
-    driver = webdriver.Chrome(options=options, service=ChromeService(version="114.0.5735.16").install())#ChromeDriverManager().install()))#
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
     # login page
     driver.get("http://trivietedu.ileader.vn/login.aspx")
     # find username/email field and send the username itself to the input field
